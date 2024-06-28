@@ -1,0 +1,80 @@
+services:
+  database:
+    image: postgres:16
+    container_name: navigate-db
+    restart: unless-stopped
+    environment:
+      - POSTGRES_PASSWORD=${DB_PASS}
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_DB=${DB_NAME}
+      - PGDATA=/var/lib/postgresql/data/pgdata
+    ports:
+      - "${EXPOSE_DB_PORT}:5432"
+    volumes:
+      - database-volume:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready", "-d", "db_prod" ]
+      interval: 30s
+      timeout: 60s
+      retries: 5
+      start_period: 80s
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "2m"
+        max-file: "5"
+  configs:
+    image: "nlsoftware/navigate-configs:latest"
+    container_name: navigate-configs
+    restart: unless-stopped
+    environment:
+      - DATABASE_URL=postgresql://${DB_USER}:${DB_PASS}@navigate-db:5432/${DB_NAME}
+      - SERVER_PORT=${SERVER_PORT}
+    depends_on:
+      database:
+        condition: service_healthy
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "2m"
+        max-file: "5"
+  server:
+    image: "noirlab/gpp-nav:latest"
+    container_name: navigate-server
+    restart: unless-stopped
+    volumes:
+      - ${UI_DIST_DIR}:/opt/docker/app
+    ports:
+      - "${EXPOSE_NAVIGATE_WEBSERVER_PORT}:${NAVIGATE_WEBSERVER_PORT}"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "2m"
+        max-file: "5"
+  ui:
+    image: "nlsoftware/navigate-ui:latest"
+    container_name: navigate-ui
+    restart: no
+    volumes:
+      - ${UI_DIST_DIR}:/opt/navigate/dist
+      - ${UI_ENV_FILE}:/opt/navigate/.env.production
+    command: sh -c "npm run build"
+  pgadmin:
+    image: "dpage/pgadmin4:latest"
+    container_name: navigate-pgadmin
+    restart: unless-stopped
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=${PGADMIN_EMAIL}
+      - PGADMIN_DEFAULT_PASSWORD=${PGADMIN_PASS}
+    ports:
+      - "${EXPOSE_PORT_PGA}:80"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "2m"
+        max-file: "5"
+
+volumes:
+  database-volume:
+    name: navigate-database-volume
+    external: false
