@@ -30,6 +30,8 @@ services:
     environment:
       - DATABASE_URL=postgresql://${DB_USER}:${DB_PASS}@navigate-db:5432/${DB_NAME}
       - SERVER_PORT=${SERVER_PORT}
+    volumes:
+      - configs-volume:/usr/src/app/dbinit
     depends_on:
       database:
         condition: service_healthy
@@ -77,4 +79,7 @@ services:
 volumes:
   database-volume:
     name: navigate-database-volume
+    external: false
+  configs-volume:
+    name: navigate-configs-volume
     external: false
