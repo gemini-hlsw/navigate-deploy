@@ -8,10 +8,10 @@ services:
       - POSTGRES_USER=${DB_USER}
       - POSTGRES_DB=${DB_NAME}
       - PGDATA=/var/lib/postgresql/data/pgdata
-    ports:
-      - "${EXPOSE_DB_PORT}:5432"
     volumes:
       - database-volume:/var/lib/postgresql/data
+    ports:
+      - "${EXPOSE_DB_PORT}:5432"
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready", "-d", "db_prod" ]
       interval: 30s
@@ -32,6 +32,8 @@ services:
       - SERVER_PORT=${SERVER_PORT}
     volumes:
       - configs-volume:/usr/src/app/dbinit
+    ports:
+      - 4000:4000
     depends_on:
       database:
         condition: service_healthy
@@ -44,10 +46,14 @@ services:
     image: "noirlab/gpp-nav:latest"
     container_name: navigate-server
     restart: unless-stopped
+    network_mode: host
     volumes:
-      - ${UI_DIST_DIR}:/opt/docker/app
+      - ${UI_DIST_DIR}:/opt/docker/dist
+      - ${CONFIG_DIR}:/opt/docker/conf/local
     ports:
-      - "${EXPOSE_NAVIGATE_WEBSERVER_PORT}:${NAVIGATE_WEBSERVER_PORT}"
+      - "${NAVIGATE_EXPOSE_PORT}:7070"
+      - 5064:5064
+      - 5065:5065
     logging:
       driver: "json-file"
       options:
