@@ -48,7 +48,6 @@ services:
     restart: unless-stopped
     network_mode: host
     volumes:
-      - ${UI_DIST_DIR}:/opt/docker/dist
       - ${CONFIG_DIR}:/opt/docker/conf/local
     ports:
       - "${NAVIGATE_EXPOSE_PORT}:7070"
@@ -59,14 +58,6 @@ services:
       options:
         max-size: "2m"
         max-file: "5"
-  ui:
-    image: "nlsoftware/navigate-ui:latest"
-    container_name: navigate-ui
-    restart: no
-    volumes:
-      - ${UI_DIST_DIR}:/opt/navigate/dist
-      - ${UI_ENV_FILE}:/opt/navigate/.env.production
-    command: sh -c "npm run build"
   pgadmin:
     image: "dpage/pgadmin4:latest"
     container_name: navigate-pgadmin
