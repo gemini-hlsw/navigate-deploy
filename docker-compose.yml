@@ -53,6 +53,9 @@ services:
       - "${NAVIGATE_EXPOSE_PORT}:7070"
       - 5064:5064
       - 5065:5065
+    environment:
+      - ODB_SERVICE_JWT=${ODB_SERVICE_JWT}
+      - ODB_SSO_PUBLIC_KEY=${ODB_SSO_PUBLIC_KEY}
     logging:
       driver: "json-file"
       options:
