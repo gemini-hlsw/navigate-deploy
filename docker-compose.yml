@@ -56,6 +56,8 @@ services:
     environment:
       - ODB_SERVICE_JWT=${ODB_SERVICE_JWT}
       - ODB_SSO_PUBLIC_KEY=${ODB_SSO_PUBLIC_KEY}
+      - ODB_URL=${ODB_URL}
+      - OBSERVE_URL=${OBSERVE_URL}
     logging:
       driver: "json-file"
       options:
