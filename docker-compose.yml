@@ -49,6 +49,7 @@ services:
     network_mode: host
     volumes:
       - ${CONFIG_DIR}:/opt/docker/conf/local
+      - ${LOG_DIR}:/gemsoft/var/log/navigate/
     ports:
       - "${NAVIGATE_EXPOSE_PORT}:7070"
       - 5064:5064
@@ -58,6 +59,7 @@ services:
       - ODB_SSO_PUBLIC_KEY=${ODB_SSO_PUBLIC_KEY}
       - ODB_URL=${ODB_URL}
       - OBSERVE_URL=${OBSERVE_URL}
+      - APP_ENV=${APP_ENV}
     logging:
       driver: "json-file"
       options:
